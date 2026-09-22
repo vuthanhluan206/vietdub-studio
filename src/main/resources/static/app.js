@@ -143,9 +143,15 @@ async function refreshJobs() {
       if (job.error) { const error = document.createElement('p'); error.className = 'error'; error.textContent = job.error; row.append(error); }
       const actions = document.createElement('p'); actions.className = 'actions';
       if (job.status === 'COMPLETED') {
+        const caption = await (await api(`/api/jobs/${job.id}/caption`)).json();
+        const captionLabel = document.createElement('label'); captionLabel.textContent = 'Mô tả TikTok';
+        const captionInput = document.createElement('textarea');
+        captionInput.className = 'job-caption'; captionInput.maxLength = 2200; captionInput.rows = 3;
+        captionInput.value = caption.caption;
+        captionLabel.append(captionInput); row.append(captionLabel);
         addButton(actions, 'Xem trước', () => openVideo(job.id, false));
         addButton(actions, 'Tải MP4', () => openVideo(job.id, true));
-        if (tiktokState.postingEnabled) addButton(actions, 'Đăng lên TikTok', () => openPublish(job.id), 'publish-button');
+        if (tiktokState.postingEnabled) addButton(actions, 'Đăng lên TikTok', () => openPublish(job.id, captionInput.value), 'publish-button');
       }
       if (job.status === 'FAILED') addButton(actions, 'Thử lại', async () => {
         if (!confirm('Thử lại tác vụ từ đầu bằng AI cục bộ?')) return;
@@ -153,7 +159,7 @@ async function refreshJobs() {
       });
       row.append(actions); $('jobs').append(row);
     }
-    timer = setTimeout(refreshJobs, 3000);
+    if (jobs.some(job => !['COMPLETED', 'FAILED'].includes(job.status))) timer = setTimeout(refreshJobs, 3000);
   } catch (error) { show('message', error.message, true); }
 }
 
@@ -181,16 +187,15 @@ async function openVideo(id, download) {
   }
 }
 
-async function openPublish(jobId) {
+async function openPublish(jobId, caption) {
   show('message', 'Đang lấy thông tin mới nhất từ tài khoản TikTok…');
-  const [creator, blob, caption] = await Promise.all([
+  const [creator, blob] = await Promise.all([
     api('/api/tiktok/creator').then(response => response.json()),
-    api(`/api/jobs/${jobId}/file`).then(response => response.blob()),
-    api(`/api/jobs/${jobId}/caption`).then(response => response.json())
+    api(`/api/jobs/${jobId}/file`).then(response => response.blob())
   ]);
   publishJobId = jobId;
   $('tiktok-form').reset();
-  $('post-title').value = caption.caption;
+  $('post-title').value = caption;
   $('creator-name').textContent = creator.username ? `${creator.nickname} (@${creator.username})` : creator.nickname;
   const privacy = $('privacy-level');
   privacy.replaceChildren(new Option('Chọn quyền riêng tư', ''));
@@ -225,6 +230,7 @@ function updatePublishForm() {
   $('brand-policy').hidden = !$('branded-content').checked;
   const disclosureValid = !commercial || $('your-brand').checked || $('branded-content').checked;
   $('submit-publish').disabled = !$('privacy-level').value || !$('publish-consent').checked || !disclosureValid;
+  $('submit-publish').title = disclosureValid ? '' : 'Hãy chọn nội dung quảng bá thương hiệu của bạn, bên thứ ba hoặc cả hai.';
 }
 
 for (const id of ['privacy-level', 'commercial-content', 'your-brand', 'branded-content', 'publish-consent']) {

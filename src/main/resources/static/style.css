@@ -92,6 +92,8 @@ input[type=file]::file-selector-button:hover { background: #e9f5ef; }
 .job[data-status="FAILED"] strong { color: #a73330; background: #fdece9; }
 .job p { margin: 10px 0; overflow-wrap: anywhere; font-size: .87rem; }
 .job small { display: block; color: var(--muted); font-size: .72rem; overflow-wrap: anywhere; }
+.job > label { margin: 16px 0 0; }
+.job-caption { margin-top: 7px; background: white; }
 .job .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 0; }
 .job .actions:empty { display: none; }
 .job .actions button { min-height: 44px; padding: 8px 15px; font-size: .82rem; }
@@ -108,7 +110,7 @@ dialog::backdrop { background: #0c242a99; backdrop-filter: blur(3px); }
 .icon-button { width: 44px; min-height: 44px; padding: 0; border-radius: 50%; font-size: 1.45rem; }
 .account-line { margin: 18px 0 0; padding: 12px 15px; border-radius: 9px; color: var(--muted); background: #f1f7f5; font-size: .88rem; }
 .account-line strong { color: #173b40; }
-#tiktok-preview { max-height: 360px; }
+#tiktok-preview { max-height: 240px; }
 fieldset { margin: 22px 0 0; padding: 0; border: 0; }
 legend { font-weight: 600; font-size: .91rem; }
 fieldset .check { display: inline-flex; margin: 10px 22px 0 0; }

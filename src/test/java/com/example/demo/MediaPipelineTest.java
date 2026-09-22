@@ -92,6 +92,29 @@ class MediaPipelineTest {
     }
 
     @Test
+    void createsTheTikTokCaptionWithOllama() throws Exception {
+        var json = JsonMapper.builder().build();
+        HttpServer ollama = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        ollama.createContext("/api/chat", exchange -> {
+            byte[] response = """
+                    {"message":{"content":"{\\"caption\\":\\"Mẹo nấu mì nhanh cho ngày bận rộn. #monngon #meobep\\"}"}}
+                    """.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.close();
+        });
+        ollama.start();
+        try {
+            var environment = new MockEnvironment().withProperty("app.ai-provider", "local")
+                    .withProperty("app.ollama-url", "http://127.0.0.1:" + ollama.getAddress().getPort() + "/api/chat");
+            assertEquals("Mẹo nấu mì nhanh cho ngày bận rộn. #monngon #meobep",
+                    new MediaPipeline(environment, json).generatePostCaption(List.of("Cách nấu mì thật nhanh")));
+        } finally {
+            ollama.stop(0);
+        }
+    }
+
+    @Test
     void rendersTimedDubUsingRealFfmpegAndLocalFakeAi() throws Exception {
         Path ffmpeg = Path.of("tools", "ffmpeg.exe").toAbsolutePath();
         Path ffprobe = Path.of("tools", "ffprobe.exe").toAbsolutePath();

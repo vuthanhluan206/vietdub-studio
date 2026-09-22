@@ -189,6 +189,7 @@ async function openPublish(jobId) {
   ]);
   publishJobId = jobId;
   $('tiktok-form').reset();
+  $('post-title').value = 'Video được lồng tiếng Việt bằng AI. #longtieng #tiengviet';
   $('creator-name').textContent = creator.username ? `${creator.nickname} (@${creator.username})` : creator.nickname;
   const privacy = $('privacy-level');
   privacy.replaceChildren(new Option('Chọn quyền riêng tư', ''));

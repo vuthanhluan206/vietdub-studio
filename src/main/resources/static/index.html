@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lồng tiếng Việt · Làm tool TikTok</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <main>
+    <div class="appbar">
+      <a class="brand" href="./" aria-label="Làm tool TikTok, trang chủ">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4" />
+          </svg>
+        </span>
+        <span>Làm tool TikTok<small>Không gian lồng tiếng của bạn</small></span>
+      </a>
+      <span class="platform-badge">Phiên bản Windows</span>
+    </div>
+    <header class="hero">
+      <p class="eyebrow">VIDEO CỦA BẠN · GIỌNG NÓI MỚI</p>
+      <h1>Lồng tiếng Việt cho video</h1>
+      <p class="hero-description">Từ một đường link đến video với giọng Việt AI.<br>Thêm video, theo dõi xử lý và tải bản hoàn thiện ngay tại đây.</p>
+      <ol class="workflow" aria-label="Quy trình xử lý">
+        <li><span>01</span> Thêm video</li>
+        <li><span>02</span> Dịch &amp; lồng tiếng</li>
+        <li><span>03</span> Tải MP4</li>
+      </ol>
+    </header>
+    <div class="workspace">
+      <section class="create-card" aria-labelledby="create-heading">
+        <div class="section-heading">
+          <span class="section-icon" aria-hidden="true">＋</span>
+          <div><h2 id="create-heading">Tạo video mới</h2><p class="hint">Chọn một nguồn video để bắt đầu.</p></div>
+        </div>
+        <p id="health" role="alert" hidden></p>
+        <form id="job-form">
+          <label for="source-url">Link video TikTok</label>
+          <input id="source-url" type="url" placeholder="https://www.tiktok.com/@taikhoan/video/…">
+          <p class="source-divider">hoặc chọn từ máy tính</p>
+          <div class="upload-area">
+            <label for="source-file">Chọn video MP4 của bạn</label>
+            <input id="source-file" type="file" accept="video/mp4,.mp4" aria-describedby="file-hint">
+            <p id="file-hint" class="hint">MP4 · Tối đa 100 MB · Thời lượng đến 3 phút</p>
+          </div>
+          <label for="voice-id">Chọn giọng tiếng Việt</label>
+          <div class="voice-row">
+            <select id="voice-id" aria-describedby="voice-hint"></select>
+            <button id="preview-voice" class="secondary" type="button" disabled>Nghe thử</button>
+          </div>
+          <audio id="voice-preview" controls hidden aria-label="Nghe thử giọng đã chọn"></audio>
+          <p id="voice-hint" class="hint">Có 65 giọng Piper cục bộ; thử vài giọng để chọn chất giọng phù hợp.</p>
+          <label class="check"><input id="rights" type="checkbox" required><span>Tôi có quyền sử dụng và xử lý video này.</span></label>
+          <p class="audio-note">Ưu tiên video không watermark khi TikTok cung cấp. Giọng AI thay toàn bộ âm thanh gốc và phụ đề tiếng Việt được chèn vào video. Chữ tiếng Anh đã dính sẵn trong hình vẫn còn.</p>
+          <button id="submit-job" type="submit" disabled>Bắt đầu lồng tiếng <span aria-hidden="true">→</span></button>
+        </form>
+        <p id="message" role="status" aria-live="polite"></p>
+      </section>
+      <div class="side-panel">
+        <section class="jobs-card" aria-labelledby="jobs-heading">
+          <div class="row">
+            <h2 id="jobs-heading">Video mới nhất</h2>
+            <button id="refresh" class="secondary" type="button" disabled>Làm mới</button>
+          </div>
+          <p class="hint">Theo dõi tiến trình và tải bản MP4 vừa tạo.</p>
+          <div id="jobs"><p>Chưa có video.<br>Thêm link hoặc MP4 để bắt đầu.</p></div>
+          <video id="preview" controls hidden aria-label="Xem trước video lồng tiếng"></video>
+        </section>
+        <section class="tiktok-card" aria-labelledby="tiktok-heading">
+          <div class="row"><h2 id="tiktok-heading">Tài khoản TikTok</h2><span class="muted-badge">Tùy chọn</span></div>
+          <p class="hint">Kết nối tài khoản để đăng trực tiếp video vừa hoàn thành lên trang cá nhân.</p>
+          <button id="connect-tiktok" class="secondary" type="button" disabled>Kết nối tài khoản</button>
+          <p id="tiktok-status" role="status"></p>
+        </section>
+      </div>
+    </div>
+    <footer>Làm tool TikTok <span aria-hidden="true">·</span> Không gian thử nghiệm cá nhân trên Windows</footer>
+
+    <dialog id="tiktok-dialog" aria-labelledby="publish-heading">
+      <form id="tiktok-form">
+        <div class="dialog-heading">
+          <div><p class="eyebrow">ĐĂNG TRỰC TIẾP</p><h2 id="publish-heading">Đăng video lên TikTok</h2></div>
+          <button id="close-publish" class="icon-button secondary" type="button" aria-label="Đóng">×</button>
+        </div>
+        <p class="account-line">Tài khoản nhận video: <strong id="creator-name"></strong></p>
+        <video id="tiktok-preview" controls aria-label="Xem trước video sẽ đăng"></video>
+
+        <label for="post-title">Mô tả video</label>
+        <textarea id="post-title" maxlength="2200" rows="3" placeholder="Viết mô tả, hashtag hoặc nhắc đến tài khoản…"></textarea>
+        <label for="privacy-level">Quyền riêng tư</label>
+        <select id="privacy-level" required><option value="">Chọn quyền riêng tư</option></select>
+
+        <fieldset>
+          <legend>Cho phép người xem</legend>
+          <label class="check"><input id="allow-comment" type="checkbox"><span>Bình luận</span></label>
+          <label class="check"><input id="allow-duet" type="checkbox"><span>Duet</span></label>
+          <label class="check"><input id="allow-stitch" type="checkbox"><span>Stitch</span></label>
+        </fieldset>
+
+        <label class="check"><input id="commercial-content" type="checkbox"><span>Nội dung này quảng bá tôi, thương hiệu, sản phẩm hoặc dịch vụ.</span></label>
+        <div id="commercial-options" class="commercial-options" hidden>
+          <label class="check"><input id="your-brand" type="checkbox"><span>Thương hiệu của tôi <small>Video sẽ được gắn nhãn “Nội dung quảng bá”.</small></span></label>
+          <label class="check"><input id="branded-content" type="checkbox"><span>Nội dung có tài trợ <small>Video sẽ được gắn nhãn “Quan hệ đối tác có trả phí”.</small></span></label>
+        </div>
+
+        <label class="check consent"><input id="publish-consent" type="checkbox"><span>Bằng việc đăng, tôi đồng ý với
+          <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener">Xác nhận sử dụng nhạc</a><span id="brand-policy" hidden> và
+          <a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank" rel="noopener">Chính sách nội dung có thương hiệu</a></span> của TikTok.</span></label>
+        <p class="hint">Video sử dụng giọng AI nên TikTok sẽ nhận khai báo nội dung do AI tạo. Quá trình xử lý trên TikTok có thể mất vài phút.</p>
+        <p id="publish-status" role="status" aria-live="polite"></p>
+        <div class="dialog-actions">
+          <button id="cancel-publish" class="secondary" type="button">Hủy</button>
+          <button id="submit-publish" type="submit" disabled>Đăng lên TikTok</button>
+        </div>
+      </form>
+    </dialog>
+  </main>
+</body>
+
+</html>

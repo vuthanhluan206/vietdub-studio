@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS jobs (
+    id VARCHAR(36) PRIMARY KEY,
+    source_url VARCHAR(2048),
+    voice_id INT DEFAULT 0 NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    error_message VARCHAR(2000),
+    created_at VARCHAR(40) NOT NULL,
+    updated_at VARCHAR(40) NOT NULL
+);
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS voice_id INT DEFAULT 0 NOT NULL;

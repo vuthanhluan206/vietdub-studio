@@ -1,0 +1,27 @@
+:root {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: #18343b;
+  background: #f3f7f6;
+  --accent: #087b70;
+  --muted: #5c7076;
+  --border: #dbe7e4;
+}
+* { box-sizing: border-box; }
+body { margin: 0; line-height: 1.65; }
+header, main, footer { width: min(860px, calc(100% - 32px)); margin-inline: auto; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 28px 0; }
+.brand { color: #17383e; font-size: 1.15rem; font-weight: 750; text-decoration: none; }
+nav { display: flex; flex-wrap: wrap; gap: 16px; font-size: .9rem; }
+a { color: var(--accent); }
+main { padding: clamp(28px, 6vw, 62px); background: white; border: 1px solid var(--border); border-radius: 22px; box-shadow: 0 12px 40px #143a430a; }
+h1 { margin: 0 0 18px; color: #143038; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.15; letter-spacing: -.035em; }
+h2 { margin: 34px 0 10px; color: #17383e; font-size: 1.25rem; }
+p, li { color: #38545b; }
+.lead { color: var(--muted); font-size: 1.08rem; }
+.eyebrow { margin: 0 0 8px; color: var(--accent); font-size: .75rem; font-weight: 750; letter-spacing: .12em; }
+.notice { padding: 16px 18px; border-left: 4px solid var(--accent); background: #eef7f4; border-radius: 8px; }
+footer { padding: 28px 0 40px; color: var(--muted); font-size: .82rem; }
+@media (max-width: 600px) {
+  header { align-items: flex-start; flex-direction: column; }
+  main { padding: 28px 20px; border-radius: 16px; }
+}

@@ -112,6 +112,18 @@ public class JobService {
         return file;
     }
 
+    public String caption(UUID id) {
+        result(id);
+        Path file = directory(id).resolve("post-caption.txt");
+        try {
+            if (Files.isRegularFile(file)) {
+                String caption = Files.readString(file).strip();
+                if (!caption.isEmpty() && caption.length() <= 300) return caption;
+            }
+        } catch (IOException ignored) { }
+        return "Video lồng tiếng Việt bằng AI. #longtieng #tiengviet #AI";
+    }
+
     private void enqueue(UUID id) {
         try {
             worker.execute(() -> process(id));
@@ -133,6 +145,10 @@ public class JobService {
                 source = media.download(job.sourceUrl(), work);
             }
             Path rendered = media.process(source, work, job.voiceId(), stage -> update(id, stage, null));
+            Path caption = work.resolve("post-caption.txt");
+            if (Files.isRegularFile(caption)) {
+                Files.move(caption, directory(id).resolve("post-caption.txt"), StandardCopyOption.REPLACE_EXISTING);
+            }
             Files.move(rendered, directory(id).resolve("result.mp4"),
                     StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
         } catch (InterruptedException ex) {

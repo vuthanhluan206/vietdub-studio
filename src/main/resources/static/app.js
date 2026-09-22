@@ -183,13 +183,14 @@ async function openVideo(id, download) {
 
 async function openPublish(jobId) {
   show('message', 'Đang lấy thông tin mới nhất từ tài khoản TikTok…');
-  const [creator, blob] = await Promise.all([
+  const [creator, blob, caption] = await Promise.all([
     api('/api/tiktok/creator').then(response => response.json()),
-    api(`/api/jobs/${jobId}/file`).then(response => response.blob())
+    api(`/api/jobs/${jobId}/file`).then(response => response.blob()),
+    api(`/api/jobs/${jobId}/caption`).then(response => response.json())
   ]);
   publishJobId = jobId;
   $('tiktok-form').reset();
-  $('post-title').value = 'Video được lồng tiếng Việt bằng AI. #longtieng #tiengviet';
+  $('post-title').value = caption.caption;
   $('creator-name').textContent = creator.username ? `${creator.nickname} (@${creator.username})` : creator.nickname;
   const privacy = $('privacy-level');
   privacy.replaceChildren(new Option('Chọn quyền riêng tư', ''));

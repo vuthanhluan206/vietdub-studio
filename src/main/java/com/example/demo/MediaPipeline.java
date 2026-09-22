@@ -164,6 +164,7 @@ public class MediaPipeline {
                 config.getProperty("app.max-segments", Integer.class, 60));
         stage.accept("TRANSLATING");
         List<String> translations = translate(segments);
+        Files.writeString(workDir.resolve("post-caption.txt"), postCaption(translations), StandardCharsets.UTF_8);
         stage.accept("SPEAKING");
         List<Path> voices = new ArrayList<>();
         List<Double> speeds = new ArrayList<>();
@@ -420,6 +421,18 @@ public class MediaPipeline {
         }
         if (!chunk.isEmpty()) chunks.add(chunk.toString());
         return chunks.isEmpty() ? List.of("…") : chunks;
+    }
+
+    static String postCaption(List<String> translations) {
+        String text = String.join(" ", translations).replaceAll("[\\p{Cntrl}\\s]+", " ").strip();
+        if (text.isEmpty()) return "Video lồng tiếng Việt bằng AI. #longtieng #tiengviet #AI";
+        if (text.length() > 140) {
+            int end = text.lastIndexOf(' ', 140);
+            text = text.substring(0, end < 80 ? 140 : end).strip() + "…";
+        } else if (".!?…".indexOf(text.charAt(text.length() - 1)) < 0) {
+            text += ".";
+        }
+        return text + " #longtieng #tiengviet #AI";
     }
 
     double duration(Path file) throws IOException, InterruptedException {

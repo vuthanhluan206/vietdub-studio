@@ -78,6 +78,11 @@ public class JobController {
                 .contentLength(resource.contentLength()).body(resource);
     }
 
+    @GetMapping("/jobs/{id}/caption")
+    Map<String, String> caption(@PathVariable UUID id) {
+        return Map.of("caption", jobs.caption(id));
+    }
+
     private static ResponseEntity<JobService.Job> accepted(JobService.Job job) {
         return ResponseEntity.accepted().location(URI.create("/api/jobs/" + job.id())).body(job);
     }

@@ -68,6 +68,9 @@ class MediaPipelineTest {
         assertEquals("This is one sentence.", merged.getFirst().text());
         assertEquals(List.of("Một câu phụ đề ngắn được chia để không che", "quá nhiều hình ảnh"),
                 MediaPipeline.captionChunks("Một câu phụ đề ngắn được chia để không che quá nhiều hình ảnh"));
+        assertEquals("Cách làm món ăn nhanh. #longtieng #tiengviet #AI",
+                MediaPipeline.postCaption(List.of("Cách làm món ăn", "nhanh")));
+        assertTrue(MediaPipeline.postCaption(List.of("nội dung ".repeat(30))).length() <= 180);
         assertEquals(1, MediaPipeline.speechSpeed(1.2, 2, 1.35));
         assertEquals(1.23, MediaPipeline.speechSpeed(2.4, 2, 1.35), 0.00001);
         assertEquals(2.11, MediaPipeline.speechSpeed(4.16, 2, 2.5), 0.00001);
@@ -150,6 +153,7 @@ class MediaPipelineTest {
             List<String> stages = new ArrayList<>();
             Path result = new MediaPipeline(environment, json).process(source, directory.resolve("work"), 0, stages::add);
             assertTrue(Files.size(result) > 1000);
+            assertTrue(Files.readString(directory.resolve("work/post-caption.txt")).contains("Xin chào"));
             assertEquals(4, requests.get());
             assertEquals(List.of("EXTRACTING", "TRANSCRIBING", "TRANSLATING", "SPEAKING", "RENDERING"), stages);
             Path decoded = directory.resolve("result.pcm");

@@ -417,11 +417,16 @@ public class TikTokService {
                 + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8)).collect(Collectors.joining("&"));
     }
 
-    private static ResponseStatusException providerError(int status, String code, String message) {
+    static ResponseStatusException providerError(int status, String code, String message) {
+        if ("unaudited_client_can_only_post_to_private_accounts".equals(code)) {
+            return new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Ứng dụng TikTok chưa qua kiểm duyệt. Hãy bật Tài khoản riêng tư trên TikTok "
+                            + "và chọn quyền riêng tư Chỉ mình tôi (SELF_ONLY), rồi đăng lại.");
+        }
         HttpStatus result = status == 429 || Set.of("rate_limit_exceeded", "spam_risk_too_many_posts",
                         "reached_active_user_cap").contains(code) ? HttpStatus.TOO_MANY_REQUESTS
                 : status == 401 || "access_token_invalid".equals(code) ? HttpStatus.UNAUTHORIZED
-                : "scope_not_authorized".equals(code) ? HttpStatus.FORBIDDEN : HttpStatus.BAD_GATEWAY;
+                : status == 403 || "scope_not_authorized".equals(code) ? HttpStatus.FORBIDDEN : HttpStatus.BAD_GATEWAY;
         String detail = clean(code, 80);
         String description = clean(message, 160);
         return new ResponseStatusException(result, "TikTok từ chối yêu cầu"

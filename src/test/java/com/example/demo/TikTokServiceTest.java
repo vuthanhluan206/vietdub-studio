@@ -72,4 +72,14 @@ class TikTokServiceTest {
                 false, false, false);
         assertThrows(ResponseStatusException.class, () -> TikTokService.validatePost(creator, invalid, 30));
     }
+
+    @Test
+    void explainsUnauditedPrivateAccountRequirement() {
+        ResponseStatusException error = TikTokService.providerError(403,
+                "unaudited_client_can_only_post_to_private_accounts", "Review the integration guidelines");
+
+        assertEquals(403, error.getStatusCode().value());
+        assertTrue(error.getReason().contains("Tài khoản riêng tư"));
+        assertTrue(error.getReason().contains("SELF_ONLY"));
+    }
 }

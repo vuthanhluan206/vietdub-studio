@@ -95,6 +95,12 @@ class MediaPipelineTest {
     void createsTheTikTokCaptionWithOllama() throws Exception {
         var json = JsonMapper.builder().build();
         HttpServer ollama = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        ollama.createContext("/api/tags", exchange -> {
+            byte[] response = "{\"models\":[{\"name\":\"qwen3:1.7b\"}]}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.close();
+        });
         ollama.createContext("/api/chat", exchange -> {
             byte[] response = """
                     {"message":{"content":"{\\"caption\\":\\"Mẹo nấu mì nhanh cho ngày bận rộn. #monngon #meobep\\"}"}}
@@ -107,6 +113,7 @@ class MediaPipelineTest {
         try {
             var environment = new MockEnvironment().withProperty("app.ai-provider", "local")
                     .withProperty("app.ollama-url", "http://127.0.0.1:" + ollama.getAddress().getPort() + "/api/chat");
+            assertTrue(new MediaPipeline(environment, json).ollamaReady());
             assertEquals("Mẹo nấu mì nhanh cho ngày bận rộn. #monngon #meobep",
                     new MediaPipeline(environment, json).generatePostCaption(List.of("Cách nấu mì thật nhanh")));
         } finally {

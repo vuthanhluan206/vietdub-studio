@@ -43,7 +43,7 @@ public class MediaPipeline {
     boolean aiConfigured() {
         if (!localAi()) return hasUsableApiKey(setting("openai-api-key", ""));
         return Files.isRegularFile(tool("whisper")) && Files.isRegularFile(tool("whisper-model"))
-                && Files.isRegularFile(tool("piper")) && Files.isRegularFile(tool("piper-model"));
+                && Files.isRegularFile(tool("piper")) && Files.isRegularFile(tool("piper-model")) && ollamaReady();
     }
 
     String provider() { return localAi() ? "local" : "openai"; }
@@ -473,10 +473,7 @@ public class MediaPipeline {
     }
 
     private JsonNode postLocalJson(Object body) throws IOException, InterruptedException {
-        URI uri = URI.create(setting("ollama-url", "http://127.0.0.1:11434/api/chat"));
-        if (!"http".equals(uri.getScheme()) || !Set.of("localhost", "127.0.0.1", "[::1]").contains(uri.getHost())) {
-            throw new IOException("Ollama URL phải là HTTP trên máy cục bộ.");
-        }
+        URI uri = ollamaUri();
         HttpResponse<byte[]> response;
         try {
             response = http.send(HttpRequest.newBuilder(uri).timeout(Duration.ofMinutes(10))
@@ -493,6 +490,28 @@ public class MediaPipeline {
         if (response.body().length == 0 || response.body().length > 4_000_000)
             throw new IOException("Ollama local trả dữ liệu trống hoặc quá lớn.");
         return json.readTree(response.body());
+    }
+
+    boolean ollamaReady() {
+        try {
+            HttpResponse<byte[]> response = http.send(HttpRequest.newBuilder(ollamaUri().resolve("/api/tags"))
+                    .timeout(Duration.ofSeconds(2)).GET().build(), HttpResponse.BodyHandlers.ofByteArray());
+            if (response.statusCode() != 200 || response.body().length > 1_000_000) return false;
+            for (JsonNode model : json.readTree(response.body()).path("models")) {
+                if (model.path("name").asText().equals(setting("ollama-model", "qwen3:1.7b"))) return true;
+            }
+        } catch (InterruptedException error) {
+            Thread.currentThread().interrupt();
+        } catch (Exception ignored) { }
+        return false;
+    }
+
+    private URI ollamaUri() throws IOException {
+        URI uri = URI.create(setting("ollama-url", "http://127.0.0.1:11434/api/chat"));
+        if (!"http".equals(uri.getScheme()) || !Set.of("localhost", "127.0.0.1", "[::1]").contains(uri.getHost())) {
+            throw new IOException("Ollama URL phải là HTTP trên máy cục bộ.");
+        }
+        return uri;
     }
 
     private byte[] send(String endpoint, String contentType, HttpRequest.BodyPublisher body) throws IOException, InterruptedException {

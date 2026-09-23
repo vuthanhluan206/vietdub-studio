@@ -70,6 +70,7 @@ class MediaPipelineTest {
                 MediaPipeline.captionChunks("Một câu phụ đề ngắn được chia để không che quá nhiều hình ảnh"));
         assertEquals("Cách làm món ăn nhanh. #longtieng #tiengviet #AI",
                 MediaPipeline.postCaption(List.of("Cách làm món ăn", "nhanh")));
+        assertThrows(IllegalArgumentException.class, () -> MediaPipeline.postCaption(List.of()));
         assertTrue(MediaPipeline.postCaption(List.of("nội dung ".repeat(30))).length() <= 180);
         assertEquals(1, MediaPipeline.speechSpeed(1.2, 2, 1.35));
         assertEquals(1.23, MediaPipeline.speechSpeed(2.4, 2, 1.35), 0.00001);

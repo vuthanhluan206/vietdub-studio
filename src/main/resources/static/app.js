@@ -148,6 +148,7 @@ async function refreshJobs() {
         const captionInput = document.createElement('textarea');
         captionInput.className = 'job-caption'; captionInput.maxLength = 2200; captionInput.rows = 3;
         captionInput.value = caption.caption;
+        captionInput.placeholder = 'Video cũ chưa có mô tả nội dung. Hãy nhập mô tả hoặc xử lý lại video.';
         captionLabel.append(captionInput); row.append(captionLabel);
         addButton(actions, 'Xem trước', () => openVideo(job.id, false));
         addButton(actions, 'Tải MP4', () => openVideo(job.id, true));
@@ -188,6 +189,7 @@ async function openVideo(id, download) {
 }
 
 async function openPublish(jobId, caption) {
+  if (!caption.trim()) throw new Error('Mô tả đang trống. Hãy nhập nội dung video trước khi đăng TikTok.');
   show('message', 'Đang lấy thông tin mới nhất từ tài khoản TikTok…');
   const [creator, blob] = await Promise.all([
     api('/api/tiktok/creator').then(response => response.json()),

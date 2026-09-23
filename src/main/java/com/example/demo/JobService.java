@@ -121,7 +121,7 @@ public class JobService {
                 if (!caption.isEmpty() && caption.length() <= 300) return caption;
             }
         } catch (IOException ignored) { }
-        return "Video lồng tiếng Việt bằng AI. #longtieng #tiengviet #AI";
+        return "";
     }
 
     private void enqueue(UUID id) {

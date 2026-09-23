@@ -425,7 +425,7 @@ public class MediaPipeline {
 
     static String postCaption(List<String> translations) {
         String text = String.join(" ", translations).replaceAll("[\\p{Cntrl}\\s]+", " ").strip();
-        if (text.isEmpty()) return "Video lồng tiếng Việt bằng AI. #longtieng #tiengviet #AI";
+        if (text.isEmpty()) throw new IllegalArgumentException("Không có lời thoại để tạo mô tả TikTok.");
         if (text.length() > 140) {
             int end = text.lastIndexOf(' ', 140);
             text = text.substring(0, end < 80 ? 140 : end).strip() + "…";
